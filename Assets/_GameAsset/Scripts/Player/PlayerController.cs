@@ -30,6 +30,8 @@ public class PlayerController : MonoBehaviour
     private PlayerLocamotionInput _playerLocamotionInput;
     private Vector2 _cameraRotation = Vector2.zero;
     private Vector2 _playerTargetRotation = Vector2.zero;
+    private float _yaw;   // left-right (around Y)
+    private float _pitch; // up-down (around X)
 
 
     private void Awake()
@@ -56,12 +58,25 @@ public class PlayerController : MonoBehaviour
 
     private void LateUpdate()
     {
-        _cameraRotation.x += _playerLocamotionInput.LookInput.x * _lookSensevityH;
-        _cameraRotation.y = Mathf.Clamp(_cameraRotation.y - _lookSensevityV - _playerLocamotionInput.LookInput.y, -_lookLimitV, _lookLimitV);
+        // _cameraRotation.x += _playerLocamotionInput.LookInput.x * _lookSensevityH;
+        // _cameraRotation.y = Mathf.Clamp(_cameraRotation.y - _lookSensevityV - _playerLocamotionInput.LookInput.y, -_lookLimitV, _lookLimitV);
 
-        _cameraRotation.x += transform.eulerAngles.x + _lookSensevityH * _playerLocamotionInput.LookInput.x;
-        transform.rotation = Quaternion.Euler(0f, _playerTargetRotation.x, 0f);
+        // _cameraRotation.x += transform.eulerAngles.x + _lookSensevityH * _playerLocamotionInput.LookInput.x;
+        // transform.rotation = Quaternion.Euler(0f, _playerTargetRotation.x, 0f);
 
-        _playerCamera.transform.rotation = Quaternion.Euler(_cameraRotation.y, _cameraRotation.x, 0f);
+        // _playerCamera.transform.rotation = Quaternion.Euler(_cameraRotation.y, _cameraRotation.x, 0f);
+
+        Vector2 look = _playerLocamotionInput.LookInput; // mouse Δ or right-stick
+
+        // horizontal
+        _yaw   += look.x * _lookSensevityH;
+        
+        // vertical (invert if you like)
+        _pitch -= look.y * _lookSensevityV;
+        _pitch  = Mathf.Clamp(_pitch, -_lookLimitV, _lookLimitV);
+
+        // rotate body (yaw) and camera (pitch) separately
+        transform.rotation               = Quaternion.Euler(0f, _yaw,   0f);
+        _playerCamera.transform.localRotation = Quaternion.Euler(_pitch, 0f, 0f);
     }
 }
