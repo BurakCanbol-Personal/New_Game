@@ -4,8 +4,10 @@ using UnityEngine.InputSystem;
 [DefaultExecutionOrder(-2)]
 public class PlayerLocamotionInput : MonoBehaviour, PlayerControls.IPlayerLocomotionMapActions
 {
-    public PlayerControls PlayerControls { get; private set; }
+    [SerializeField] private bool holdToSprint = true;
 
+    public bool SprintOn { get; private set; }
+    public PlayerControls PlayerControls { get; private set; }
     public Vector2 MovementInput { get; private set; }
     public Vector2 LookInput { get; private set; }
 
@@ -33,5 +35,17 @@ public class PlayerLocamotionInput : MonoBehaviour, PlayerControls.IPlayerLocomo
     public void OnLook(InputAction.CallbackContext context)
     {
         LookInput = context.ReadValue<Vector2>();
+    }
+
+    public void OnSprint(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+        {
+            SprintOn = holdToSprint || !SprintOn;
+        }
+        else if (context.canceled)
+        {
+            SprintOn = !holdToSprint && SprintOn;
+        }
     }
 }
